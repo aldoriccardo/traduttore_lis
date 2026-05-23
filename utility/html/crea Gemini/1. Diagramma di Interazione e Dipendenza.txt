@@ -1,0 +1,10 @@
+1. Diagramma di Interazione e Dipendenza
+Le tabelle non sono più isolate, ma formano un ecosistema dove il significato (Lemma) è separato dal contenuto multimediale (Segno).
+
+Descrizione delle interazioni:
+
+1) lemmi_it → segni_lis (Relazione Molti-a-Uno): Molti lemmi italiani (es: "mangio", "mangiavo", "mangiato") puntano a un singolo record in segni_lis (il video del segno MANGIARE). La chiave di collegamento è id_segno. Questa è la dipendenza più forte: un lemma non può esistere senza un segno associato.
+
+2) disambiguazione → segni_lis (Relazione Molti-a-Uno): Quando il sistema trova una parola ambigua (es: "riso"), consulta questa tabella. In base alla "parola chiave" trovata nel contesto, la tabella indica l' id_segno_corretto da recuperare.
+
+3) segni_lis (Il Cuore): È la tabella indipendente. Contiene i nomi dei file video. Se cambi il nome di un file video qui, tutti i lemmi collegati si aggiornano automaticamente.

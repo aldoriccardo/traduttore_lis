@@ -1,0 +1,20 @@
+pip install mysql-connector-python
+
+
+import mysql.connector
+
+class LISTranslator:
+    def __init__(self):
+        try:
+            # Configurazione per XAMPP
+            self.db = mysql.connector.connect(
+                host="localhost",          # Solitamente localhost per XAMPP
+                user="root",               # Utente predefinito di XAMPP
+                password="",               # Di default XAMPP non ha password per root
+                database="dizionario_lis_gemini",
+                port=3306                  # Porta standard MySQL
+            )
+            self.cursor = self.db.cursor(dictionary=True)
+            print("Connessione al database 'dizionario_lis_gemini' riuscita!")
+        except mysql.connector.Error as err:
+            print(f"Errore di connessione: {err}")

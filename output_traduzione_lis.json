@@ -1,0 +1,67 @@
+{
+    "testo_lavagna": "Marco non mangiava la mia mela",
+    "attore": "attore1",
+    "tipo_frase": "AFFERMATIVA",
+    "playlist_lis": [
+        {
+            "parola_originale": "PRIMA",
+            "lemma_lis": "PRIMA",
+            "tipo": "STANDARD",
+            "percorso_video": "vocabolario/attore1/parola-non-trovata.mp4"
+        },
+        {
+            "parola_originale": "Marco",
+            "lemma_lis": "LETTERA_M",
+            "tipo": "LETTERA_DATTILOLOGIA",
+            "percorso_video": "vocabolario/attore1/m.mp4"
+        },
+        {
+            "parola_originale": "Marco",
+            "lemma_lis": "LETTERA_A",
+            "tipo": "LETTERA_DATTILOLOGIA",
+            "percorso_video": "vocabolario/attore1/a.mp4"
+        },
+        {
+            "parola_originale": "Marco",
+            "lemma_lis": "LETTERA_R",
+            "tipo": "LETTERA_DATTILOLOGIA",
+            "percorso_video": "vocabolario/attore1/r.mp4"
+        },
+        {
+            "parola_originale": "Marco",
+            "lemma_lis": "LETTERA_C",
+            "tipo": "LETTERA_DATTILOLOGIA",
+            "percorso_video": "vocabolario/attore1/c.mp4"
+        },
+        {
+            "parola_originale": "Marco",
+            "lemma_lis": "LETTERA_O",
+            "tipo": "LETTERA_DATTILOLOGIA",
+            "percorso_video": "vocabolario/attore1/o.mp4"
+        },
+        {
+            "parola_originale": "mela",
+            "lemma_lis": "Sconosciuto",
+            "tipo": "NON_TROVATO",
+            "percorso_video": "vocabolario/attore1/parola-non-trovata.mp4"
+        },
+        {
+            "parola_originale": "mia",
+            "lemma_lis": "mio",
+            "tipo": "STANDARD",
+            "percorso_video": "vocabolario/attore1/mio.mp4"
+        },
+        {
+            "parola_originale": "mangiava",
+            "lemma_lis": "mangiare",
+            "tipo": "STANDARD",
+            "percorso_video": "vocabolario/attore1/mangiare.mp4"
+        },
+        {
+            "parola_originale": "non",
+            "lemma_lis": "non",
+            "tipo": "STANDARD",
+            "percorso_video": "vocabolario/attore1/non.mp4"
+        }
+    ]
+}

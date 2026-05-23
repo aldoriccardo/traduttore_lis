@@ -1,0 +1,32 @@
+INSERT INTO segni_lis (nome_segno, file_video, aggiunte)
+SELECT DISTINCT 
+    UPPER(vocabolo), 
+    vocabolo_lis_mp4, 
+    aggiunte
+FROM my_dizionario 
+WHERE vocabolo_lis_mp4 != '' AND vocabolo_lis_mp4 IS NOT NULL;
+
+INSERT INTO lemmi_it (vocabolo, tipo, genere, numero, tempo_verbo, id_segno)
+SELECT 
+    m.vocabolo,
+    CASE 
+        WHEN m.tipo = 'sostantivo' THEN 'sostantivo'
+        WHEN m.tipo = 'verbo' THEN 'verbo'
+        WHEN m.tipo = 'lettera' THEN 'lettera'
+        WHEN m.tipo = 'aggettivo' THEN 'aggettivo'
+        ELSE 'sostantivo' 
+    END,
+    CASE 
+        WHEN m.num_declinazione = 'M' THEN 'M'
+        WHEN m.num_declinazione = 'F' THEN 'F'
+        ELSE NULL 
+    END,
+    CASE 
+        WHEN m.campo_libero = 'S' THEN 'S'
+        WHEN m.campo_libero = 'P' THEN 'P'
+        ELSE 'S' 
+    END,
+    m.tempo_verbo,
+    s.id_segno
+FROM my_dizionario m
+JOIN segni_lis s ON m.vocabolo_lis_mp4 = s.file_video;

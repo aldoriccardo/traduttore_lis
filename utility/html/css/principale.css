@@ -1,0 +1,124 @@
+ body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: #f4f7f6;
+	margin: 0;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+}
+.container {
+	background-color: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+	max-width: 950px; /* Allargato per ospitare comodamente le due colonne */
+	width: 100%;
+	box-sizing: border-box;
+}
+h1 { 
+	color: #333; 
+	margin-top: 0;
+	margin-bottom: 25px; 
+	font-size: 26px; 
+	text-align: center;
+}
+
+/* --- GRIGLIA PRINCIPALE A DUE COLONNE --- */
+.split-layout {
+	display: flex;
+	gap: 30px; /* Spazio di separazione tra colonna SX e DX */
+	align-items: flex-start;
+}
+
+/* COLONNA SINISTRA (Pannello di Controllo) */
+.col-left {
+	flex: 1.2; /* Leggermente più larga per i testi e i pulsanti */
+	display: flex;
+	flex-direction: column;
+}
+
+/* COLONNA DESTRA (Area Video Player) */
+.col-right {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+/* --- ELEMENTI COLONNA SINISTRA --- */
+.controls-panel {
+	display: flex;
+	justify-content: space-around;
+	gap: 15px;
+	margin-bottom: 20px;
+}
+.btn-control {
+	flex: 1;
+	padding: 12px;
+	font-size: 15px;
+	font-weight: bold;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.2s, transform 0.1s;
+	color: white;
+}
+.btn-control:active { transform: scale(0.98); }
+
+#btn-start { background-color: #28a745; box-shadow: 0 4px 6px rgba(40,167,69,0.2); }
+#btn-start:hover { background-color: #218838; }
+
+#btn-stop { background-color: #dc3545; box-shadow: 0 4px 6px rgba(220,53,69,0.2); }
+#btn-stop:hover { background-color: #c82333; }
+
+.status { font-style: italic; color: #666; margin-bottom: 20px; min-height: 20px; font-weight: 500; }
+
+.attore-selector {
+	background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;
+	padding: 15px; margin-bottom: 20px; text-align: left;
+}
+.attore-selector h3 { margin: 0 0 10px 0; font-size: 15px; color: #444; }
+.radio-group { display: flex; justify-content: space-around; }
+.radio-label { font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+.output-box {
+	width: 100%; min-height: 100px; border: 2px solid #e0e0e0; border-radius: 8px;
+	padding: 12px; box-sizing: border-box; font-size: 16px; background-color: #fafafa;
+	resize: none;
+}
+
+/* --- ELEMENTI COLONNA DESTRA (PLAYER VIDEO) --- */
+.player-container {
+	background-color: #000; 
+	border-radius: 8px; 
+	overflow: hidden;
+	width: 100%; 
+	max-width: 400px; 
+	box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+	position: relative;
+	display: block; 
+}
+video { 
+	width: 100%; 
+	display: block; 
+	background-size: cover; 
+	background-position: center;
+}
+
+.word-overlay {
+	position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+	background: rgba(0, 0, 0, 0.7); color: #fff; padding: 5px 15px;
+	border-radius: 20px; font-weight: bold; font-size: 16px; pointer-events: none;
+	white-space: nowrap;
+}
+.interrogativa-banner {
+	background-color: #ffc107; color: #000; font-weight: bold;
+	padding: 8px; border-radius: 6px; margin-bottom: 15px; width: 100%;
+	box-sizing: border-box; text-align: center; display: none;
+}
+
+#invia-manuale { display: none; }

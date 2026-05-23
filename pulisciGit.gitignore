@@ -1,0 +1,12 @@
+# Cache di Python
+__pycache__/
+*.pyc
+
+# File di Blender e salvataggi automatici (se presenti nelle cartelle)
+*.blend
+*.blend1
+*.blend2
+
+# File di sistema nascosti
+Thumbs.db
+.DS_Store

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traduttore LIS Continuo - Split Layout</title>
+    <link rel="stylesheet" type="text/css" href="css/principale.css" >
+       
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Traduttore LIS Vocale Automatico</h1>
+    
+    <div class="split-layout">
+        
+        <div class="col-left">
+            <div class="controls-panel">
+                <button id="btn-start" class="btn-control">🟢 AVVIA ASCOLTO</button>
+                <button id="btn-stop" class="btn-control">🔴 SPEGNI / RESET</button>
+            </div>
+            
+            <div id="stato-registrazione" class="status">Sistema Spento. Clicca su Avvia per iniziare.</div>
+
+            <div class="attore-selector">
+                <h3>Seleziona Personaggio:</h3>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="attore_scelto" value="Angela" checked> 👩 Angela (Femminile)
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="attore_scelto" value="Silvio"> 👨 Silvio (Maschile)
+                    </label>
+                </div>
+            </div>
+
+            <textarea id="testo-riconosciuto" class="output-box" placeholder="La frase intercettata apparirà qui..."></textarea>
+            <button id="invia-manuale"></button>
+        </div>
+        
+        <div class="col-right">
+            <div id="banner-int" class="interrogativa-banner">❓ ESPRESSIONE: Sopracciglia Alzate</div>
+
+            <div id="box-player" class="player-container">
+                <video id="video-player" preload="auto"></video>
+                <div id="word-label" class="word-overlay">PRONTO</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="javascript/principale.js"></script>
+</body>
+</html>

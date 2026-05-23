@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traduttore LIS - Player Sperimentale</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 { color: #333; margin-bottom: 20px; font-size: 24px; }
+        
+        .btn-mic {
+            background-color: #007bff; color: white; border: none; border-radius: 50%;
+            width: 70px; height: 70px; font-size: 28px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,123,255,0.3);
+            margin-bottom: 15px;
+        }
+        .btn-mic.recording { background-color: #dc3545; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .status { font-style: italic; color: #666; margin-bottom: 15px; min-height: 20px; }
+        
+        .attore-selector {
+            background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;
+            padding: 12px; margin-bottom: 15px; text-align: left;
+        }
+        .attore-selector h3 { margin: 0 0 8px 0; font-size: 15px; color: #444; }
+        .radio-group { display: flex; justify-content: space-around; }
+        .radio-label { font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+        .output-box {
+            width: 100%; min-height: 60px; border: 2px solid #e0e0e0; border-radius: 8px;
+            padding: 10px; box-sizing: border-box; font-size: 16px; background-color: #fafafa;
+            margin-bottom: 15px; resize: none;
+        }
+        
+        /* --- AREA PLAYER VIDEO --- */
+        .player-container {
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            display: none; /* Nascosto finché non c'è una traduzione */
+        }
+        video { width: 100%; display: block; }
+        
+        .word-overlay {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7); color: #fff; padding: 5px 15px;
+            border-radius: 20px; font-weight: bold; font-size: 16px; pointer-events: none;
+        }
+        .interrogativa-banner {
+            background-color: #ffc107; color: #000; font-weight: bold;
+            padding: 8px; border-radius: 6px; margin-bottom: 15px; display: none;
+        }
+
+        .btn-invia {
+            background-color: #28a745; color: white; border: none; border-radius: 6px;
+            padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;
+        }
+        .btn-invia:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Traduttore LIS Vocale</h1>
+    
+    <button id="pushed-mic" class="btn-mic">🎙️</button>
+    <div id="stato-registrazione" class="status">Clicca sul microfono per parlare</div>
+
+    <div class="attore-selector">
+        <h3>Seleziona Personaggio:</h3>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="attore_scelto" value="Angela" checked> 👩 Angela (Femminile)
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="attore_scelto" value="Silvio"> 👨 Silvio (Maschile)
+            </label>
+        </div>
+    </div>
+
+    <textarea id="testo-riconosciuto" class="output-box" placeholder="La tua frase apparirà qui..."></textarea>
+    <button id="invia-server" class="btn-invia">Invia e Traduci in LIS</button>
+
+    <div id="banner-int" class="interrogativa-banner">❓ ESPRESSIONE FACCIALE: Sopracciglia Alzate (Frase Interrogativa)</div>
+
+    <div id="box-player" class="player-container">
+        <video id="video-player" preload="auto"></video>
+        <div id="word-label" class="word-overlay">Sottotitolo LIS</div>
+    </div>
+</div>
+
+<script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        alert("Il tuo browser non supporta il riconoscimento vocale. Usa Google Chrome.");
+    } else {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'it-IT';
+        recognition.interimResults = false;
+
+        const micBtn = document.getElementById('pushed-mic');
+        const statusDiv = document.getElementById('stato-registrazione');
+        const textarea = document.getElementById('testo-riconosciuto');
+        const sendBtn = document.getElementById('invia-server');
+        
+        // Elementi del Player
+        const boxPlayer = document.getElementById('box-player');
+        const videoPlayer = document.getElementById('video-player');
+        const wordLabel = document.getElementById('word-label');
+        const bannerInt = document.getElementById('banner-int');
+
+        let isRecording = false;
+        let playlistVideo = [];
+        let indiceCorrente = 0;
+        let attoreGlobale = "Angela";
+
+        micBtn.addEventListener('click', () => {
+            if (!isRecording) { recognition.start(); } else { recognition.stop(); }
+        });
+
+        recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); statusDiv.innerText = "Ascolto..."; };
+        recognition.onend = () => { isRecording = false; micBtn.classList.remove('recording'); statusDiv.innerText = "Clicca sul microfono per parlare"; };
+        recognition.onresult = (event) => { textarea.value = event.results[0][0].transcript; };
+
+        // --- FUNZIONE CORE: IL RIPRODUTTORE SEQUENZIALE ---
+        function riproduciPlaylist() {
+            if (playlistVideo.length === 0) return;
+
+            if (indiceCorrente >= playlistVideo.length) {
+                statusDiv.innerText = "Riproduzione LIS completata.";
+                statusDiv.style.color = "#28a745";
+                wordLabel.innerText = "FINE";
+                return;
+            }
+
+            const nodoCorrente = playlistVideo[indiceCorrente];
+            
+            // COSTRUZIONE URL REALE SU XAMPP:
+            // Mappiamo la struttura reale delle tue cartelle
+            let cartellaPersonaggio = (attoreGlobale === "Angela") ? "personaggioFemminile" : "personaggioMaschile";
+            let base_url = `http://localhost/mioWeb/Siti%20Invalidi/LIS_Linguaggio_dei_Segni/vocabolario/${cartellaPersonaggio}/vocaboli/`;
+            
+            // Estraiamo il nome del file video dal percorso inviato dal server (es: "mangiare.mp4")
+            let nomeFileVideo = nodoCorrente.percorso_video.split('/').pop();
+            
+            // Componiamo l'indirizzo web finale del video che il browser caricherà
+            let urlVideoFinale = base_url + nomeFileVideo;
+
+            console.log(`In riproduzione (${indiceCorrente + 1}/${playlistVideo.length}): `, urlVideoFinale);
+
+            // Aggiorniamo la grafica a schermo
+            wordLabel.innerText = nodoCorrente.lemma_lis.toUpperCase();
+            statusDiv.innerText = `Segno corrente: ${nodoCorrente.parola_originale}`;
+            statusDiv.style.color = "#007bff";
+
+            // Carichiamo il sorgente nel player e lo avviamo
+            videoPlayer.src = urlVideoFinale;
+            videoPlayer.load();
+            
+            // Il play() potrebbe richiedere interazione utente, ma avendo premuto il tasto "Invia" siamo al sicuro
+            videoPlayer.play().catch(err => {
+                console.log("Errore riproduzione automatica: ", err);
+                // Fallback: se si blocca passa comunque al successivo per non congelare la pagina
+                avanzaPlaylist();
+            });
+        }
+
+        function avanzaPlaylist() {
+            indiceCorrente++;
+            riproduciPlaylist();
+        }
+
+        // Quando il video corrente FINISCE, l'evento scatta e passa subito al prossimo video!
+        videoPlayer.onended = () => {
+            avanzaPlaylist();
+        };
+
+        // Se un video fallisce il caricamento (es. manca il file), saltiamo oltre dopo 1 secondo per non bloccare tutto
+        videoPlayer.onerror = () => {
+            console.error("Impossibile caricare il video: " + videoPlayer.src);
+            setTimeout(avanzaPlaylist, 1000);
+        };
+
+
+        // --- INVIO DATI AL SERVER PYTHON ---
+        sendBtn.addEventListener('click', () => {
+            const frase = textarea.value.trim();
+            if (!frase) { alert("Detta una frase prima di inviare!"); return; }
+
+            attoreGlobale = document.querySelector('input[name="attore_scelto"]:checked').value;
+
+            statusDiv.innerText = `Traduzione in corso per ${attoreGlobale}...`;
+            statusDiv.style.color = "#007bff";
+            
+            // Nascondiamo il player prima del caricamento
+            boxPlayer.style.display = "none";
+            bannerInt.style.display = "none";
+
+            fetch('http://127.0.0.1:5000/traduci', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ frase: frase, attore: attoreGlobale })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("JSON LIS Ricevuto:", data);
+                
+                // Gestione della mimica facciale globale (Interrogativa)
+                if (data.tipo_frase === "INTERROGATIVA") {
+                    bannerInt.style.display = "block";
+                }
+
+                // Configura la playlist globale per il riproduttore
+                playlistVideo = data.playlist_lis;
+                indiceCorrente = 0;
+
+                if (playlistVideo.length > 0) {
+                    // Mostriamo il player video a schermo e facciamo partire la sequenza
+                    boxPlayer.style.display = "block";
+                    riproduciPlaylist();
+                } else {
+                    statusDiv.innerText = "Nessun segno generato nella playlist.";
+                    statusDiv.style.color = "#dc3545";
+                }
+            })
+            .catch(error => {
+                console.error("Errore:", error);
+                statusDiv.innerText = "Errore di connessione con Python.";
+                statusDiv.style.color = "#dc3545";
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
