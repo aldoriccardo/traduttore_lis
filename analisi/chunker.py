@@ -8,18 +8,36 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.db_config import get_connection
 
-def is_verbo_nel_db(parola, lemma):
-    """Verifica se la parola è un verbo nel tuo DB XAMPP."""
+from psycopg2.extras import RealDictCursor  # FONDAMENTALE: aggiungi questo import in cima al file se manca
+
+
+def is_verbo_nel_db(testo, lemma):
+    """Verifica se una parola è registrata come verbo nel database Cloud di Render."""
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return False
 
-    query = "SELECT tipo FROM lemmi_it WHERE (vocabolo = %s OR vocabolo = %s) AND tipo = 'verbo' LIMIT 1"
-    cursor.execute(query, (parola, lemma))
-    risultato = cursor.fetchone()
+    # MODIFICA CLOUD: Usiamo RealDictCursor al posto di dictionary=True
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-    cursor.close()
-    conn.close()
-    return risultato is not None
+    # Nuova query ottimizzata per la tabella relazionale lemmi_it
+    query = """
+        SELECT id_lemma FROM lemmi_it 
+        WHERE (LOWER(vocabolo) = %s OR LOWER(vocabolo) = %s) 
+          AND LOWER(tipo) = 'verbo' 
+        LIMIT 1
+    """
+
+    try:
+        cursor.execute(query, (testo, lemma))
+        risultato = cursor.fetchone()
+        return risultato is not None
+    except Exception as e:
+        print(f"  [ERRORE CHUNKER] Errore di lettura: {e}")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
 
 
 def dividi_in_proposizioni_con_db(testo):

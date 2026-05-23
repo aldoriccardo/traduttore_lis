@@ -1,6 +1,8 @@
 import os
 import sys
 import spacy
+import psycopg2  # Assicurati che sia importato psycopg2
+from psycopg2.extras import RealDictCursor  # FONDAMENTALE PER LEGGERE I DIZIONARI DA POSTGRES
 
 # Paracadute per i percorsi: dice a Python di guardare nella cartella superiore se non trova 'database'
 radice_progetto = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -23,10 +25,11 @@ def cerca_parola_nel_db(vocabolo, tipo_atteso=None):
     if not conn:
         return None
 
-    cursor = conn.cursor(dictionary=True)
+    # MODIFICA CLOU: Usiamo RealDictCursor specifico per PostgreSQL
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     parola_pulita = vocabolo.lower().strip()
 
-    # Usiamo LIKE e TRIM per evitare problemi con spazi o maiuscole nel database
+    # Nuova query con la JOIN relazionale creata su Render
     if tipo_atteso:
         tipo_pulito = tipo_atteso.lower().strip()
         query = """
